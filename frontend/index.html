@@ -1,26 +1,31 @@
+
 <!DOCTYPE html> <!-- Define que o documento utiliza HTML5 -->
 <html lang="pt-br"> <!-- Define o idioma da página como Português do Brasil -->
 
 <head> <!-- Inicia a seção de configurações da página -->
-    <meta charset="UTF-8"> <!-- Define a codificação de caracteres UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajusta a página para diferentes tamanhos de tela -->
-    <title>Minhas Tarefas - Gerenciador</title> <!-- Define o título exibido na aba do navegador -->
+    <meta charset="UTF-8"> <!-- Define a codificação de caracteres -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Adapta a página para diferentes tamanhos de tela -->
+    <title>Minhas Tarefas - Gerenciador</title> <!-- Define o título da aba do navegador -->
 
-    <!-- Importa o CSS do Bootstrap para estilização da página -->
+    <!-- Importa o CSS do Bootstrap para estilizar os elementos da página -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Importa os ícones utilizados nos botões -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 </head> <!-- Finaliza a seção de configurações -->
 
 <body class="bg-light"> <!-- Inicia o corpo da página com fundo claro -->
 
     <!-- Cria a barra de navegação superior -->
     <nav class="navbar navbar-dark bg-dark mb-4">
-        <!-- Define um container para organizar os elementos da barra -->
+
+        <!-- Organiza o nome da aplicação e o botão de saída -->
         <div class="container d-flex justify-content-between align-items-center">
 
-            <!-- Exibe o nome da aplicação na barra de navegação -->
+            <!-- Exibe o nome do sistema -->
             <span class="navbar-brand mb-0 h1">Gerenciador de Tarefas</span>
 
-            <!-- Cria o botão que executa a função logout() ao ser clicado -->
+            <!-- Cria o botão que encerra a sessão do usuário -->
             <button onclick="logout()" class="btn btn-outline-danger btn-sm">Sair / Logout</button>
 
         </div> <!-- Finaliza o container da barra de navegação -->
@@ -29,7 +34,7 @@
     <!-- Cria o container principal da página -->
     <div class="container">
 
-        <!-- Cria uma linha para organizar o conteúdo -->
+        <!-- Organiza o conteúdo no centro da página -->
         <div class="row justify-content-center">
 
             <!-- Define uma coluna que ocupa 8 espaços em telas médias ou maiores -->
@@ -41,13 +46,41 @@
                     <!-- Cria o cabeçalho do cartão -->
                     <div class="card-header bg-white">
 
-                        <!-- Exibe o título da seção de tarefas -->
+                        <!-- Exibe o título da seção -->
                         <h4 class="mb-0">Suas Tarefas</h4>
 
                     </div> <!-- Finaliza o cabeçalho do cartão -->
 
                     <!-- Cria o corpo do cartão -->
                     <div class="card-body">
+
+                        <!-- Cria o formulário responsável por cadastrar novas tarefas -->
+                        <form onsubmit="createTask(event)" class="mb-4">
+
+                            <!-- Agrupa o campo de descrição e o botão de cadastro -->
+                            <div class="input-group">
+
+                                <!-- Campo onde o usuário digita a descrição da tarefa -->
+                                <input
+                                    type="text"
+                                    id="taskDescription"
+                                    class="form-control"
+                                    placeholder="Digite uma nova tarefa..."
+                                    minlength="1"
+                                    maxlength="255"
+                                    required
+                                >
+
+                                <!-- Botão que envia o formulário para cadastrar a tarefa -->
+                                <button type="submit" class="btn btn-primary">
+
+                                    <!-- Exibe o ícone de adicionar -->
+                                    <i class="bi bi-plus-lg"></i> Adicionar
+
+                                </button>
+
+                            </div> <!-- Finaliza o agrupamento do campo e do botão -->
+                        </form> <!-- Finaliza o formulário de cadastro -->
 
                         <!-- Cria uma área de carregamento inicialmente escondida -->
                         <div id="loading" class="text-center my-3" style="display: none;">
@@ -61,7 +94,7 @@
                             </div> <!-- Finaliza o indicador de carregamento -->
                         </div> <!-- Finaliza a área de carregamento -->
 
-                        <!-- Cria uma lista onde as tarefas serão adicionadas pelo JavaScript -->
+                        <!-- Cria a lista onde as tarefas serão adicionadas pelo JavaScript -->
                         <ul id="tasks-list" class="list-group">
 
                             <!-- As tarefas serão inseridas dinamicamente pelo arquivo script.js -->
@@ -76,7 +109,7 @@
     </div> <!-- Finaliza o container principal -->
 
     <!-- Cria uma janela modal para editar as tarefas -->
-    <div class="modal fade" id="editTaskModel" tabindex="-1" aria-labelledby="editTaskModel" aria-hidden="true">
+    <div class="modal fade" id="editTaskModel" tabindex="-1" aria-labelledby="editTaskTitle" aria-hidden="true">
 
         <!-- Define o posicionamento centralizado da janela modal -->
         <div class="modal-dialog modal-dialog-centered">
@@ -84,17 +117,17 @@
             <!-- Cria o conteúdo interno da janela modal -->
             <div class="modal-content">
 
-                <!-- Cria um formulário que executa update(event) ao ser enviado -->
+                <!-- Cria o formulário que executa update(event) ao ser enviado -->
                 <form onsubmit="update(event)">
 
                     <!-- Cria o cabeçalho da janela modal -->
-                    <div class="modal_header">
+                    <div class="modal-header">
 
                         <!-- Exibe o título da janela de edição -->
-                        <h5 class="modal-title" id="editTaskModel">Editor de Tarefas</h5>
+                        <h5 class="modal-title" id="editTaskTitle">Editar Tarefa</h5>
 
-                        <!-- Cria o botão para fechar a janela modal -->
-                        <button type="button" class="btn-close" data-b5-dismis="modal" aria-label="Fechar"></button>
+                        <!-- Cria o botão responsável por fechar a janela modal -->
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
 
                     </div> <!-- Finaliza o cabeçalho da janela modal -->
 
@@ -104,14 +137,21 @@
                         <!-- Armazena o ID da tarefa que será editada sem exibi-lo -->
                         <input type="hidden" id="edit-task-id">
 
-                        <!-- Cria um espaço para organizar o campo de edição -->
+                        <!-- Organiza o campo de edição da tarefa -->
                         <div class="mb-3">
 
                             <!-- Define o texto que identifica o campo de descrição -->
                             <label for="edit-task-description" class="form-label">Descrição da Tarefa</label>
 
-                            <!-- Cria o campo para editar a descrição da tarefa -->
-                            <input type="text" class="form-control" id="edit-task-description" required minlength="1" maxlength="255">
+                            <!-- Cria o campo onde o usuário poderá alterar a descrição -->
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="edit-task-description"
+                                required
+                                minlength="1"
+                                maxlength="255"
+                            >
 
                         </div> <!-- Finaliza o campo de edição -->
 
@@ -120,23 +160,28 @@
                     <!-- Cria o rodapé da janela modal -->
                     <div class="modal-footer">
 
-                        <!-- Cria o botão para cancelar a edição e fechar a janela -->
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <!-- Cria o botão que cancela a edição e fecha a janela -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
 
                         <!-- Cria o botão que envia o formulário para salvar as alterações -->
-                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        <button type="submit" class="btn btn-primary">
+                            Salvar Alterações
+                        </button>
 
                     </div> <!-- Finaliza o rodapé da janela modal -->
 
-                </form> <!-- Finaliza o formulário -->
+                </form> <!-- Finaliza o formulário de edição -->
+
             </div> <!-- Finaliza o conteúdo da janela modal -->
         </div> <!-- Finaliza o posicionamento da janela modal -->
     </div> <!-- Finaliza a janela modal -->
 
-    <!-- Importa o JavaScript do Bootstrap para funcionamento dos componentes -->
+    <!-- Importa o JavaScript do Bootstrap para permitir o funcionamento da janela modal -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Importa o arquivo JavaScript responsável pelo controle das tarefas e da sessão -->
+    <!-- Importa o arquivo JavaScript responsável pelo cadastro, edição, exclusão e listagem das tarefas -->
     <script src="scripts/script.js"></script>
 
 </body> <!-- Finaliza o corpo da página -->
