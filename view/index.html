@@ -1,0 +1,34 @@
+<!DOCTYPE html> <!--Declara que este documento segue o padrão HTML 5-->
+<html lang="pt-BR"><!--Define o idioma principal do documento como Portugues do Brasil-->
+
+    <head><!--Cabeçalho do documento contendo metadadose links externos-->
+        <meta charset="UTF-8"><!-- define a codificação de caracteres UTF-8 como suporte a acentos-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"><!--garante suporte a telas responsivas em dispositivos móveis-->
+        <title>Tarefas App</title><!--Define o titulo que aparece na aba do navegador-->
+        <!-- link de importação da folha de estilos (CSS) do boostrap-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head><!--fechamento da seção de metadados-->
+
+    <body><!--Corpo da pagina onde fica o conteudo visivel para o usuario-->
+        <!--Container so Spinner do carregamento -->
+        <div class="d-flex justify-content-center">
+            <!--Div que reinderiza o efeito visual de carregamento rotativo-->
+            <div class="spinner-border" role="status" id="loading">
+                <!--texto oculto para leitores de tela indicando estado de carregaento-->
+                <span class="sr-only"></span>
+            </div><!--Fechamento do elemento do spinner-->
+        </div><!--Fechamento do container flex-->
+
+        <!-- título da seção centralizada usando uma classe utilitária do BootStrap-->
+        <p class="h1 text-center">Tarefas de um usuário</p>
+            <!--Estrutura da tabela HMTL estilizada com as classes utilitárias do bootstrap-->
+            <table class="table table-hover" id="tasks">
+                    <!--Conteudo interno (cabeçalhos e linhas) será inserido via Script.js-->
+            </table>
+            <!--Script para componentes interativos do bootstrap-->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+            <!--Importação do arquivo Script.js pr´prio cntendo a lógica de integração com a API-->
+            <script src="script.js"></script>
+        </body><!--Fechamento do corpo do documento-->
+
+</html><!--Fechamento da tag raiz do HTML-->

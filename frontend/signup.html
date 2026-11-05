@@ -1,0 +1,53 @@
+<!DOCTYPE html> <!-- Define a especificação HTML5 do documento -->
+<html lang="pt-br"> <!-- Define o idioma como Português do Brasil -->
+
+<head>
+    <meta charset="UTF-8"> <!-- Configura a codificação UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Define viewport responsiva -->
+    <title>Cadastro - Gerenciador de Tarefas</title> <!-- Título exibido na aba do navegador -->
+    
+    <!-- Estilização CSS via Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light d-flex align-items-center vh-100"> <!-- Centralização vertical e horizontal da tela -->
+
+    <div class="container"> <!-- Container Bootstrap -->
+        <div class="row justify-content-center"> <!-- Centralização da linha -->
+            <div class="col-md-4"> <!-- Coluna responsiva para o formulário -->
+                <div class="card shadow-sm"> <!-- Cartão com sombra leve -->
+                    <div class="card-body p-4"> <!-- Espaçamento interno do cartão -->
+                        <h3 class="text-center mb-4">Cadastrar</h3> <!-- Título da tela de cadastro -->
+
+                        <!-- Formulário de cadastro de usuário acionando a função signup() -->
+                        <form onsubmit="signup(event)">
+                            
+                            <div class="mb-3"> <!-- Entrada do nome de usuário -->
+                                <label for="username" class="form-label">Usuário</label> <!-- Rótulo do campo -->
+                                <input type="text" id="username" class="form-control" placeholder="Escolha um usuário" required> <!-- Campo obrigatório -->
+                            </div>
+
+                            <div class="mb-3"> <!-- Entrada da senha -->
+                                <label for="password" class="form-label">Senha</label> <!-- Rótulo do campo -->
+                                <input type="password" id="password" class="form-control" placeholder="Escolha uma senha" required> <!-- Campo de senha obrigatório -->
+                            </div>
+
+                            <!-- Botão de confirmação de cadastro -->
+                            <button type="submit" class="btn btn-success w-100 mb-3">Criar Conta</button>
+                        </form>
+
+                        <!-- Link para retornar à tela de login -->
+                        <div class="text-center">
+                            <small>Já tem uma conta? <a href="login.html">Faça Login</a></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Importação do script exclusivo da lógica de cadastro de usuários -->
+    <script src="scripts/signup.js"></script>
+</body>
+
+</html>

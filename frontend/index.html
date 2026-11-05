@@ -1,0 +1,57 @@
+<!DOCTYPE html> <!-- Define a especificação HTML5 -->
+<html lang="pt-br"> <!-- Define o idioma como Português do Brasil -->
+
+<head>
+    <meta charset="UTF-8"> <!-- Configuração de caracteres UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport responsiva -->
+    <title>Minhas Tarefas - Gerenciador</title> <!-- Título da página principal -->
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <!-- Barra de navegação do topo com botão de logout -->
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="navbar-brand mb-0 h1">Gerenciador de Tarefas</span> <!-- Logotipo/Título da aplicação -->
+            
+            <!-- Botão de logout que chama a função logout() ao ser clicado -->
+            <button onclick="logout()" class="btn btn-outline-danger btn-sm">Sair / Logout</button>
+        </div>
+    </nav>
+
+    <div class="container"> <!-- Container principal da página -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">Suas Tarefas</h4> <!-- Título do bloco das tarefas -->
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Elemento visual de carregamento (spinner) escondido por padrão -->
+                        <div id="loading" class="text-center my-3" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando...</span>
+                            </div>
+                        </div>
+
+                        <!-- Lista onde as tarefas recebidas da API serão injetadas via JavaScript -->
+                        <ul id="tasks-list" class="list-group">
+                            <!-- Os elementos <li> com as tarefas serão montados dinamicamente pelo script.js -->
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Importação do script JavaScript global para controle das tarefas e sessão -->
+    <script src="scripts/script.js"></script>
+</body>
+
+</html>
