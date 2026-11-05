@@ -1,178 +1,240 @@
-
- // URL base da API
+ // Define o endereço base da API
  const API_URL = "http://localhost:8080";
 
- // Executa a busca das tarefas assim que a página terminar de carregar
+ // Executa a busca das tarefas quando a página termina de carregar
  document.addEventListener("DOMContentLoaded", () => {
      getTasks();
  });
  
- // Função responsável por verificar e recuperar o token JWT do usuário
+ // Recupera o token de autenticação salvo no navegador
  function getAuthToken() {
-     const token = localStorage.getItem("Authorization"); // Recupera o token salvo no navegador
+     const token = localStorage.getItem("Authorization");
  
-     // Verifica se o usuário está autenticado
+     // Verifica se o usuário possui um token de autenticação
      if (!token) {
          alert("Acesso não autorizado! Faça login primeiro.");
-         window.location.href = "login.html"; // Redireciona para a página de login
+         window.location.href = "login.html";
          return null;
      }
  
-     return token; // Retorna o token para autenticar as requisições
+     return token;
  }
  
- // Função responsável por buscar as tarefas do usuário na API
+ // Busca as tarefas cadastradas pelo usuário na API
  async function getTasks() {
-     const token = getAuthToken(); // Recupera o token de autenticação
+     const token = getAuthToken();
  
-     if (!token) return; // Interrompe a execução caso não exista token
+     // Interrompe a função caso não exista um token
+     if (!token) return;
  
-     document.getElementById("loading").style.display = "block"; // Exibe o indicador de carregamento
+     const loading = document.getElementById("loading");
+ 
+     // Exibe o indicador de carregamento
+     if (loading) {
+         loading.style.display = "block";
+     }
  
      try {
-         // Envia uma requisição GET para buscar as tarefas do usuário autenticado
+         // Envia uma requisição GET para buscar as tarefas do usuário
          const response = await fetch(`${API_URL}/task/user`, {
              method: "GET",
              headers: {
-                 "Authorization": token, // Envia o token JWT para autenticação
-                 "Content-Type": "application/json", // Define o tipo de conteúdo da requisição
-                 "Accept": "application/json" // Informa que a resposta esperada é em JSON
+                 "Authorization": token,
+                 "Accept": "application/json"
              }
          });
  
-         // Verifica se a API retornou as tarefas corretamente
+         // Verifica se a requisição foi realizada corretamente
          if (response.ok) {
-             const tasks = await response.json(); // Converte a resposta da API para JSON
-             renderTasks(tasks); // Exibe as tarefas na página
-         } else if (response.status === 403 || response.status === 401) {
-             alert("Sessão expirada. Por favor, faça login novamente.");
-             logout(); // Encerra a sessão do usuário
+             const tasks = await response.json();
+             renderTasks(tasks);
+         } else if (response.status === 401 || response.status === 403) {
+             alert("Sessão expirada. Faça login novamente.");
+             logout();
          } else {
              alert("Erro ao buscar tarefas.");
+             console.error("Erro na busca:", response.status);
          }
+ 
      } catch (error) {
+         // Exibe erros relacionados à conexão com a API
          console.error("Erro na busca de tarefas:", error);
          alert("Erro de conexão com o servidor.");
+ 
      } finally {
-         document.getElementById("loading").style.display = "none"; // Oculta o indicador de carregamento
+         // Oculta o indicador de carregamento após a requisição
+         if (loading) {
+             loading.style.display = "none";
+         }
      }
  }
  
- // Função responsável por exibir as tarefas recebidas da API
+ // Exibe na página as tarefas recebidas da API
  function renderTasks(tasks) {
-     const tasksList = document.getElementById("tasks-list"); // Seleciona a lista de tarefas no HTML
-     tasksList.innerHTML = ""; // Limpa a lista antes de adicionar as tarefas
+     const tasksList = document.getElementById("tasks-list");
  
-     // Verifica se existem tarefas para exibir
+     // Verifica se a lista existe no HTML
+     if (!tasksList) return;
+ 
+     // Limpa a lista antes de adicionar as tarefas atualizadas
+     tasksList.innerHTML = "";
+ 
+     // Verifica se existem tarefas cadastradas
      if (!Array.isArray(tasks) || tasks.length === 0) {
-         tasksList.innerHTML = `<li class="list-group-item text-center text-muted">Nenhuma tarefa encontrada.</li>`;
+         tasksList.innerHTML = `
+             <li class="list-group-item text-center text-muted">
+                 Nenhuma tarefa encontrada.
+             </li>
+         `;
          return;
      }
  
      // Percorre todas as tarefas recebidas da API
      tasks.forEach(task => {
-         const li = document.createElement("li"); // Cria um elemento para representar a tarefa
-         li.className = "list-group-item d-flex justify-content-between align-items-center py-3"; // Define a aparência do elemento
+         // Cria o elemento que representa uma tarefa
+         const li = document.createElement("li");
+         li.className = "list-group-item d-flex justify-content-between align-items-center py-3";
  
-         const descriptionSpan = document.createElement("span"); // Cria o elemento que exibirá a descrição
-         descriptionSpan.className = "me-3 flex-grow-1 text-break"; // Define a organização e a aparência do texto
-         descriptionSpan.textContent = task.description; // Adiciona a descrição da tarefa
+         // Cria o elemento responsável por exibir a descrição
+         const descriptionSpan = document.createElement("span");
+         descriptionSpan.className = "me-3 flex-grow-1 text-break";
+         descriptionSpan.textContent = task.description;
  
-         const btnGroup = document.createElement("div"); // Cria um container para organizar os botões
-         btnGroup.className = "btn-group btn-group-sm flex-shrink-0"; // Define a aparência do grupo de botões
+         // Cria um container para organizar os botões
+         const btnGroup = document.createElement("div");
+         btnGroup.className = "btn-group btn-group-sm flex-shrink-0";
  
-         // Cria o botão responsável por editar a tarefa
+         // Cria o botão de edição da tarefa
          const editBtn = document.createElement("button");
-         editBtn.className = "btn btn-outline-primary"; // Define a aparência do botão
-         editBtn.title = "Editar tarefa"; // Define a descrição exibida ao passar o mouse
-         editBtn.innerHTML = `<i class="bi bi-pencil-fill"></i>`; // Adiciona o ícone de edição
-         editBtn.onclick = () => openEditModal(task); // Abre a janela de edição com os dados da tarefa
+         editBtn.type = "button";
+         editBtn.className = "btn btn-outline-primary";
+         editBtn.title = "Editar tarefa";
+         editBtn.innerHTML = `<i class="bi bi-pencil-fill"></i>`;
+         editBtn.onclick = () => openEditModal(task);
  
-         // Cria o botão responsável por excluir a tarefa
+         // Cria o botão de exclusão da tarefa
          const deleteBtn = document.createElement("button");
-         deleteBtn.className = "btn btn-outline-danger"; // Define a aparência do botão
-         deleteBtn.title = "Excluir tarefa"; // Define a descrição exibida ao passar o mouse
-         deleteBtn.innerHTML = `<i class="bi bi-trash-fill"></i>`; // Adiciona o ícone de exclusão
-         deleteBtn.onclick = () => deleteTask(task.id); // Executa a exclusão utilizando o ID da tarefa
+         deleteBtn.type = "button";
+         deleteBtn.className = "btn btn-outline-danger";
+         deleteBtn.title = "Excluir tarefa";
+         deleteBtn.innerHTML = `<i class="bi bi-trash-fill"></i>`;
+         deleteBtn.onclick = () => deleteTask(task.id);
  
-         btnGroup.appendChild(editBtn); // Adiciona o botão de edição ao grupo
-         btnGroup.appendChild(deleteBtn); // Adiciona o botão de exclusão ao grupo
+         // Adiciona os botões ao grupo
+         btnGroup.appendChild(editBtn);
+         btnGroup.appendChild(deleteBtn);
  
-         li.appendChild(descriptionSpan); // Adiciona a descrição ao elemento da tarefa
-         li.appendChild(btnGroup); // Adiciona os botões ao elemento da tarefa
+         // Adiciona a descrição e os botões ao elemento da tarefa
+         li.appendChild(descriptionSpan);
+         li.appendChild(btnGroup);
  
-         tasksList.appendChild(li); // Adiciona a tarefa completa à lista do HTML
+         // Adiciona a tarefa completa à lista do HTML
+         tasksList.appendChild(li);
      });
  }
  
- // Função responsável por criar uma nova tarefa na API
+ // Cadastra uma nova tarefa na API
  async function createTask(event) {
-     event.preventDefault(); // Impede o recarregamento da página ao enviar o formulário
+     // Impede que a página seja recarregada ao enviar o formulário
+     event.preventDefault();
  
-     const token = getAuthToken(); // Recupera o token de autenticação
-     if (!token) return; // Interrompe a execução caso não exista token
+     const token = getAuthToken();
  
-     const inputDescription = document.getElementById("taskDescription"); // Seleciona o campo de descrição
-     const description = inputDescription.value.trim(); // Recupera a descrição e remove espaços desnecessários
+     // Interrompe a função caso não exista um token
+     if (!token) return;
  
-     // Verifica se o campo de descrição foi preenchido
+     // Recupera o campo de descrição existente no HTML
+     const inputDescription = document.getElementById("taskDescription");
+ 
+     // Verifica se o campo foi encontrado
+     if (!inputDescription) {
+         console.error("Campo taskDescription não encontrado no HTML.");
+         return;
+     }
+ 
+     // Recupera a descrição digitada e remove espaços desnecessários
+     const description = inputDescription.value.trim();
+ 
+     // Impede o cadastro de tarefas sem descrição
      if (!description) {
-         alert("A descrição da tarefa não pode estar vazia.");
+         alert("Digite uma descrição para a tarefa.");
+         inputDescription.focus();
          return;
      }
  
      try {
-         // Envia uma requisição POST para cadastrar uma nova tarefa
+         // Envia uma requisição POST para cadastrar a nova tarefa
          const response = await fetch(`${API_URL}/task`, {
              method: "POST",
              headers: {
-                 "Authorization": token, // Envia o token JWT para autenticação
-                 "Content-Type": "application/json", // Define o tipo de conteúdo enviado
-                 "Accept": "application/json" // Informa que a resposta esperada é em JSON
+                 "Authorization": token,
+                 "Content-Type": "application/json",
+                 "Accept": "application/json"
              },
-             body: JSON.stringify({ description }) // Converte a descrição da tarefa para JSON
+ 
+             // Converte a descrição para o formato JSON
+             body: JSON.stringify({
+                 description: description
+             })
          });
  
-         // Verifica se a tarefa foi criada corretamente
+         // Verifica se a tarefa foi cadastrada corretamente
          if (response.ok) {
-             inputDescription.value = ""; // Limpa o campo após o cadastro
-             getTasks(); // Atualiza a lista de tarefas
+             inputDescription.value = "";
+             await getTasks();
+ 
          } else if (response.status === 401 || response.status === 403) {
-             alert("Sessão expirada. Por favor, faça login novamente.");
-             logout(); // Encerra a sessão do usuário
+             alert("Sessão expirada ou sem permissão. Faça login novamente.");
+             logout();
+ 
          } else {
-             alert("Não foi possível criar a tarefa. Verifique os dados inseridos.");
+             // Exibe detalhes do erro retornado pela API
+             const errorMessage = await response.text();
+             console.error("Erro ao cadastrar tarefa:", response.status, errorMessage);
+             alert("Não foi possível cadastrar a tarefa. Verifique os dados e tente novamente.");
          }
+ 
      } catch (error) {
+         // Trata possíveis erros de conexão com o servidor
          console.error("Erro ao criar tarefa:", error);
          alert("Erro de conexão com o servidor.");
      }
  }
  
- // Função responsável por abrir a janela de edição e preencher os campos com os dados da tarefa
+ // Abre a janela modal e preenche os campos com os dados da tarefa selecionada
  function openEditModal(task) {
-     document.getElementById("edit-task-id").value = task.id; // Preenche o campo oculto com o ID da tarefa
-     document.getElementById("edit-task-description").value = task.description; // Preenche o campo com a descrição atual
+     // Preenche o campo oculto com o ID da tarefa
+     document.getElementById("edit-task-id").value = task.id;
  
-     // Cria e exibe a janela modal do Bootstrap
+     // Preenche o campo com a descrição atual da tarefa
+     document.getElementById("edit-task-description").value = task.description;
+ 
+     // Recupera a janela modal do Bootstrap e a exibe na tela
      const modalElement = document.getElementById("editTaskModel");
-     const modal = new bootstrap.Modal(modalElement);
+     const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+ 
      modal.show();
  }
  
- // Função responsável por atualizar uma tarefa existente na API
+ // Atualiza uma tarefa existente na API
  async function update(event) {
-     event.preventDefault(); // Impede o recarregamento da página ao enviar o formulário
+     // Impede o recarregamento da página ao enviar o formulário
+     event.preventDefault();
  
-     const token = getAuthToken(); // Recupera o token de autenticação
-     if (!token) return; // Interrompe a execução caso não exista token
+     const token = getAuthToken();
  
-     const taskId = document.getElementById("edit-task-id").value; // Recupera o ID da tarefa selecionada
-     const newDescription = document.getElementById("edit-task-description").value.trim(); // Recupera a nova descrição
+     // Interrompe a função caso não exista um token
+     if (!token) return;
+ 
+     // Recupera o ID da tarefa selecionada
+     const taskId = document.getElementById("edit-task-id").value;
+ 
+     // Recupera a nova descrição digitada pelo usuário
+     const newDescription = document.getElementById("edit-task-description").value.trim();
  
      // Verifica se a nova descrição foi preenchida
      if (!newDescription) {
-         alert("A descrição da tarefa não pode estar vazia.");
+         alert("Digite uma descrição para a tarefa.");
          return;
      }
  
@@ -181,65 +243,92 @@
          const response = await fetch(`${API_URL}/task/${taskId}`, {
              method: "PUT",
              headers: {
-                 "Authorization": token, // Envia o token JWT para autenticação
-                 "Content-Type": "application/json", // Define o tipo de conteúdo enviado
-                 "Accept": "application/json" // Informa que a resposta esperada é em JSON
+                 "Authorization": token,
+                 "Content-Type": "application/json",
+                 "Accept": "application/json"
              },
-             body: JSON.stringify({ description: newDescription }) // Envia a nova descrição em JSON
+ 
+             // Envia a nova descrição no formato JSON
+             body: JSON.stringify({
+                 description: newDescription
+             })
          });
  
          // Verifica se a atualização foi realizada corretamente
          if (response.ok) {
-             bootstrap.Modal.getInstance(document.getElementById("editTaskModel")).hide(); // Fecha a janela de edição
-             getTasks(); // Atualiza a lista de tarefas
-         } else if (response.status === 403 || response.status === 401) {
-             alert("Sessão expirada. Por favor, faça login novamente.");
-             logout(); // Encerra a sessão do usuário
+             const modalElement = document.getElementById("editTaskModel");
+ 
+             // Fecha a janela de edição após salvar as alterações
+             bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+ 
+             // Atualiza a lista para exibir a descrição modificada
+             await getTasks();
+ 
+         } else if (response.status === 401 || response.status === 403) {
+             alert("Sessão expirada ou sem permissão. Faça login novamente.");
+             logout();
+ 
          } else {
-             alert("Erro ao atualizar tarefa.");
+             console.error("Erro ao atualizar tarefa:", response.status);
+             alert("Não foi possível atualizar a tarefa.");
          }
+ 
      } catch (error) {
+         // Trata possíveis erros de conexão durante a atualização
          console.error("Erro ao atualizar tarefa:", error);
          alert("Erro de conexão com o servidor.");
      }
  }
  
- // Função responsável por excluir uma tarefa da API
+ // Exclui uma tarefa cadastrada na API
  async function deleteTask(id) {
-     const confirmDelete = confirm("Deseja realmente excluir esta tarefa?"); // Solicita confirmação antes da exclusão
-     if (!confirmDelete) return; // Interrompe a execução caso o usuário cancele
+     // Solicita confirmação antes de excluir a tarefa
+     const confirmDelete = confirm("Deseja realmente excluir esta tarefa?");
  
-     const token = getAuthToken(); // Recupera o token de autenticação
-     if (!token) return; // Interrompe a execução caso não exista token
+     // Cancela a exclusão caso o usuário não confirme
+     if (!confirmDelete) return;
+ 
+     const token = getAuthToken();
+ 
+     // Interrompe a função caso não exista um token
+     if (!token) return;
  
      try {
-         // Envia uma requisição DELETE para excluir a tarefa pelo ID
+         // Envia uma requisição DELETE utilizando o ID da tarefa
          const response = await fetch(`${API_URL}/task/${id}`, {
              method: "DELETE",
              headers: {
-                 "Authorization": token, // Envia o token JWT para autenticação
-                 "Accept": "application/json" // Informa que a resposta esperada é em JSON
+                 "Authorization": token,
+                 "Accept": "application/json"
              }
          });
  
          // Verifica se a exclusão foi realizada corretamente
          if (response.ok) {
-             getTasks(); // Atualiza a lista após a exclusão
+             await getTasks();
+ 
          } else if (response.status === 401 || response.status === 403) {
-             alert("Sessão expirada ou sem permissão para excluir esta tarefa.");
-             logout(); // Encerra a sessão do usuário
+             alert("Sessão expirada ou sem permissão. Faça login novamente.");
+             logout();
+ 
          } else {
-             alert("Erro ao excluir tarefa.");
+             console.error("Erro ao excluir tarefa:", response.status);
+             alert("Não foi possível excluir a tarefa.");
          }
+ 
      } catch (error) {
+         // Trata possíveis erros de conexão durante a exclusão
          console.error("Erro ao excluir tarefa:", error);
          alert("Erro de conexão com o servidor.");
      }
  }
  
- // Função responsável por encerrar a sessão do usuário
+ // Encerra a sessão do usuário
  function logout() {
-     localStorage.removeItem("Authorization"); // Remove o token JWT salvo no navegador
-     window.location.href = "login.html"; // Redireciona o usuário para a página de login
+     // Remove o token de autenticação salvo no navegador
+     localStorage.removeItem("Authorization");
+ 
+     // Redireciona o usuário para a página de login
+     window.location.href = "login.html";
  }
  
