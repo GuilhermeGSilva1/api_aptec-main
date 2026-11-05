@@ -1,57 +1,143 @@
-<!DOCTYPE html> <!-- Define a especificação HTML5 -->
-<html lang="pt-br"> <!-- Define o idioma como Português do Brasil -->
+<!DOCTYPE html> <!-- Define que o documento utiliza HTML5 -->
+<html lang="pt-br"> <!-- Define o idioma da página como Português do Brasil -->
 
-<head>
-    <meta charset="UTF-8"> <!-- Configuração de caracteres UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport responsiva -->
-    <title>Minhas Tarefas - Gerenciador</title> <!-- Título da página principal -->
-    
-    <!-- Bootstrap 5 CSS -->
+<head> <!-- Inicia a seção de configurações da página -->
+    <meta charset="UTF-8"> <!-- Define a codificação de caracteres UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajusta a página para diferentes tamanhos de tela -->
+    <title>Minhas Tarefas - Gerenciador</title> <!-- Define o título exibido na aba do navegador -->
+
+    <!-- Importa o CSS do Bootstrap para estilização da página -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+</head> <!-- Finaliza a seção de configurações -->
 
-<body class="bg-light">
+<body class="bg-light"> <!-- Inicia o corpo da página com fundo claro -->
 
-    <!-- Barra de navegação do topo com botão de logout -->
+    <!-- Cria a barra de navegação superior -->
     <nav class="navbar navbar-dark bg-dark mb-4">
+        <!-- Define um container para organizar os elementos da barra -->
         <div class="container d-flex justify-content-between align-items-center">
-            <span class="navbar-brand mb-0 h1">Gerenciador de Tarefas</span> <!-- Logotipo/Título da aplicação -->
-            
-            <!-- Botão de logout que chama a função logout() ao ser clicado -->
+
+            <!-- Exibe o nome da aplicação na barra de navegação -->
+            <span class="navbar-brand mb-0 h1">Gerenciador de Tarefas</span>
+
+            <!-- Cria o botão que executa a função logout() ao ser clicado -->
             <button onclick="logout()" class="btn btn-outline-danger btn-sm">Sair / Logout</button>
-        </div>
-    </nav>
 
-    <div class="container"> <!-- Container principal da página -->
+        </div> <!-- Finaliza o container da barra de navegação -->
+    </nav> <!-- Finaliza a barra de navegação -->
+
+    <!-- Cria o container principal da página -->
+    <div class="container">
+
+        <!-- Cria uma linha para organizar o conteúdo -->
         <div class="row justify-content-center">
+
+            <!-- Define uma coluna que ocupa 8 espaços em telas médias ou maiores -->
             <div class="col-md-8">
-                
+
+                <!-- Cria um cartão com sombra para organizar as tarefas -->
                 <div class="card shadow-sm">
+
+                    <!-- Cria o cabeçalho do cartão -->
                     <div class="card-header bg-white">
-                        <h4 class="mb-0">Suas Tarefas</h4> <!-- Título do bloco das tarefas -->
-                    </div>
 
+                        <!-- Exibe o título da seção de tarefas -->
+                        <h4 class="mb-0">Suas Tarefas</h4>
+
+                    </div> <!-- Finaliza o cabeçalho do cartão -->
+
+                    <!-- Cria o corpo do cartão -->
                     <div class="card-body">
-                        <!-- Elemento visual de carregamento (spinner) escondido por padrão -->
+
+                        <!-- Cria uma área de carregamento inicialmente escondida -->
                         <div id="loading" class="text-center my-3" style="display: none;">
+
+                            <!-- Exibe o indicador de carregamento do Bootstrap -->
                             <div class="spinner-border text-primary" role="status">
+
+                                <!-- Texto acessível para leitores de tela -->
                                 <span class="visually-hidden">Carregando...</span>
-                            </div>
-                        </div>
 
-                        <!-- Lista onde as tarefas recebidas da API serão injetadas via JavaScript -->
+                            </div> <!-- Finaliza o indicador de carregamento -->
+                        </div> <!-- Finaliza a área de carregamento -->
+
+                        <!-- Cria uma lista onde as tarefas serão adicionadas pelo JavaScript -->
                         <ul id="tasks-list" class="list-group">
-                            <!-- Os elementos <li> com as tarefas serão montados dinamicamente pelo script.js -->
-                        </ul>
-                    </div>
-                </div>
 
-            </div>
-        </div>
-    </div>
+                            <!-- As tarefas serão inseridas dinamicamente pelo arquivo script.js -->
 
-    <!-- Importação do script JavaScript global para controle das tarefas e sessão -->
+                        </ul> <!-- Finaliza a lista de tarefas -->
+
+                    </div> <!-- Finaliza o corpo do cartão -->
+                </div> <!-- Finaliza o cartão -->
+
+            </div> <!-- Finaliza a coluna -->
+        </div> <!-- Finaliza a linha -->
+    </div> <!-- Finaliza o container principal -->
+
+    <!-- Cria uma janela modal para editar as tarefas -->
+    <div class="modal fade" id="editTaskModel" tabindex="-1" aria-labelledby="editTaskModel" aria-hidden="true">
+
+        <!-- Define o posicionamento centralizado da janela modal -->
+        <div class="modal-dialog modal-dialog-centered">
+
+            <!-- Cria o conteúdo interno da janela modal -->
+            <div class="modal-content">
+
+                <!-- Cria um formulário que executa update(event) ao ser enviado -->
+                <form onsubmit="update(event)">
+
+                    <!-- Cria o cabeçalho da janela modal -->
+                    <div class="modal_header">
+
+                        <!-- Exibe o título da janela de edição -->
+                        <h5 class="modal-title" id="editTaskModel">Editor de Tarefas</h5>
+
+                        <!-- Cria o botão para fechar a janela modal -->
+                        <button type="button" class="btn-close" data-b5-dismis="modal" aria-label="Fechar"></button>
+
+                    </div> <!-- Finaliza o cabeçalho da janela modal -->
+
+                    <!-- Cria o corpo da janela modal -->
+                    <div class="modal-body">
+
+                        <!-- Armazena o ID da tarefa que será editada sem exibi-lo -->
+                        <input type="hidden" id="edit-task-id">
+
+                        <!-- Cria um espaço para organizar o campo de edição -->
+                        <div class="mb-3">
+
+                            <!-- Define o texto que identifica o campo de descrição -->
+                            <label for="edit-task-description" class="form-label">Descrição da Tarefa</label>
+
+                            <!-- Cria o campo para editar a descrição da tarefa -->
+                            <input type="text" class="form-control" id="edit-task-description" required minlength="1" maxlength="255">
+
+                        </div> <!-- Finaliza o campo de edição -->
+
+                    </div> <!-- Finaliza o corpo da janela modal -->
+
+                    <!-- Cria o rodapé da janela modal -->
+                    <div class="modal-footer">
+
+                        <!-- Cria o botão para cancelar a edição e fechar a janela -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                        <!-- Cria o botão que envia o formulário para salvar as alterações -->
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+
+                    </div> <!-- Finaliza o rodapé da janela modal -->
+
+                </form> <!-- Finaliza o formulário -->
+            </div> <!-- Finaliza o conteúdo da janela modal -->
+        </div> <!-- Finaliza o posicionamento da janela modal -->
+    </div> <!-- Finaliza a janela modal -->
+
+    <!-- Importa o JavaScript do Bootstrap para funcionamento dos componentes -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Importa o arquivo JavaScript responsável pelo controle das tarefas e da sessão -->
     <script src="scripts/script.js"></script>
-</body>
 
-</html>
+</body> <!-- Finaliza o corpo da página -->
+</html> <!-- Finaliza o documento HTML -->
